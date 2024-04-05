@@ -1,10 +1,16 @@
 import { SearchResult } from "./SearchResult";
 
-export const SearchResultsList = ({ results }) => {
+export const SearchResultsList = ({ results, handleOnClick }) => {
   return (
-    <div className="w-full bg-white flex flex-col shadow-md rounded-lg mt-4 max-h-72 overflow-y-auto">
-      {results.map((result, id) => {
-        return <SearchResult result={result.full_name} key={id} />;
+    <div className="w-full bg-white dark:bg flex flex-col shadow-md rounded-lg mt-1 p-1 max-h-72 overflow-y-auto dark:bg-gray-700 dark:text-white">
+      {results.map((result) => {
+        return (
+          <SearchResult
+            result={result}
+            key={result.dni}
+            handleOnClick={handleOnClick}
+          />
+        );
       })}
     </div>
   );

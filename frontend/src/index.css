@@ -3,3 +3,25 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+*:focus {
+  @apply outline-none ring-1;
+}
+
+::-webkit-scrollbar {
+  width: 7px;
+  height: 8px;
+  background-color: transparent;
+  /* or add it to the track */
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgb(209 213 219);
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgb(178, 185, 197);
+}
+::-webkit-scrollbar-thumb:active {
+  background: rgb(156, 163, 175);
+}
