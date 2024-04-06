@@ -10,3 +10,14 @@ export const SearchResult = ({ result, handleOnClick }) => {
     </div>
   );
 };
+
+export const SearchResultSimp = ({ result, handleOnClick }) => {
+  return (
+    <div
+      className="p-2 hover:bg-gray-200 dark:hover:bg-gray-800 rounded-md"
+      onClick={() => alert(result)}
+    >
+      {result}
+    </div>
+  );
+};

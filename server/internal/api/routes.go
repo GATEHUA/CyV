@@ -17,8 +17,8 @@ func (a *Api) setupRoutes(mux *http.ServeMux) {
 
 	api.HandleFunc("GET /records", a.GetRecordsWithEmployees)
 	api.HandleFunc("GET /leaked_records", a.GetRecordsWithEmployeesByDateRange)
-	record.HandleFunc("POST /", a.AddEmployee)
-	record.HandleFunc("DELETE /{id}", a.RemoveEmployee)
+	record.HandleFunc("POST /", a.AddRecord)
+	record.HandleFunc("DELETE /{id}", a.RemoveRecord)
 
 	mux.Handle("/api/", http.StripPrefix("/api", api))
 	mux.Handle("/api/employee/", http.StripPrefix("/api/employee", employee))
