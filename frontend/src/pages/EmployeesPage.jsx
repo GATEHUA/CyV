@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { getEmployeesRequest } from "../api/employee";
+import { createEmployeeRequest, getEmployeesRequest } from "../api/employee";
 import { HeaderPageTable } from "../components/HeaderPageTable";
 import { Modal } from "../components/utils/Modal";
 import { toast } from "sonner";
@@ -12,6 +12,7 @@ import { positions } from "../data/data";
 import { AiFillSave } from "react-icons/ai";
 import { SearchResultsList } from "../components/SearchResultsList";
 import { SearchResultSimp } from "../components/SearchResult";
+import EmployeesTable from "../components/EmployeesTable";
 
 const EmployeesPage = () => {
   const [employees, setEmployees] = useState([]);
@@ -45,11 +46,23 @@ const EmployeesPage = () => {
     register,
     handleSubmit,
     setValue,
+    reset,
     formState: { errors },
   } = useForm();
+
   const onSubmit = handleSubmit((values) => {
-    console.log(values);
-    toast.success("Registrado correctamente");
+    toast.promise(createEmployeeRequest(values), {
+      className: "dark:bg-gray-700 dark:text-white",
+      loading: "Cargando...",
+      success: () => {
+        getEmployees();
+        reset();
+        return <div>Creado Correctamente</div>;
+      },
+      error: (error) => {
+        console.log(error);
+      },
+    });
   });
 
   return (
@@ -59,6 +72,7 @@ const EmployeesPage = () => {
           onShowForm={onShowEmployeeForm}
           handleChangue={handleChangue}
         />
+        <EmployeesTable data={employees} />
       </div>
       <div
         className={`h-full w-full top-0 left-0 bg-[rgba(0,0,0,0.5)] z-10 fixed ${
@@ -145,7 +159,7 @@ const EmployeesPage = () => {
                     );
                   });
                   if (e.target.value) {
-                    setStatePositions(results.slice(0, 2));
+                    setStatePositions(results);
                   } else {
                     setStatePositions([]);
                   }
@@ -156,9 +170,16 @@ const EmployeesPage = () => {
                 placeholder="Puesto"
               />
               {statePositions.length > 0 && (
-                <SearchResultsList>
+                <SearchResultsList className={"max-h-28"}>
                   {statePositions.map((p) => (
-                    <SearchResultSimp result={p} />
+                    <SearchResultSimp
+                      key={p}
+                      result={p}
+                      handleOnClick={() => {
+                        setValue("position", p);
+                        setStatePositions([]);
+                      }}
+                    />
                   ))}
                 </SearchResultsList>
               )}
