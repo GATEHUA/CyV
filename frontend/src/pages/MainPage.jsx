@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
 import { getEmployeesRequest } from "../api/employee";
 import { useForm } from "react-hook-form";
 import { AiFillSave } from "react-icons/ai";
@@ -9,6 +9,8 @@ import Button from "../components/utils/Button";
 import TextInput from "../components/utils/TextInput";
 import { toast } from "sonner";
 import { SearchResult } from "../components/SearchResult";
+import Reloj from "../components/Reloj";
+import { createRecordRequest } from "../api/record";
 
 const MainPage = () => {
   const navigate = useNavigate();
@@ -16,6 +18,7 @@ const MainPage = () => {
     register,
     handleSubmit,
     setValue,
+    reset,
     formState: { errors },
   } = useForm();
   const employees = useRef([]);
@@ -65,28 +68,45 @@ const MainPage = () => {
     getEmployees();
   }, []);
 
-  console.log(errors);
-
   const onSubmit = handleSubmit((values) => {
-    console.log(values);
-    toast.success("Registrado correctamente");
-    navigate("/current_participants", { replace: true });
+    const currentTime = new Date().toISOString();
+    toast.promise(
+      createRecordRequest({
+        employee_dni: values.dni,
+        created_at: currentTime,
+      }),
+      {
+        className: "dark:bg-gray-700 dark:text-white",
+        loading: "Cargando...",
+        success: () => {
+          reset();
+          return <div>Registrado Correctamente</div>;
+        },
+        error: (error) => {
+          return <div>{error.response.data}</div>;
+        },
+      }
+    );
   });
+
   return (
     <div className="bg-slate-200 dark:bg-slate-800 h-full min-h-screen font-Poppins">
-      <div className="pt-9 h-screen">
-        <div className="w-[80%] m-auto">
-          <img
+      <div className="pt-14 md:pt-20 h-screen">
+        <div className="w-[80%] m-auto space-y-5">
+          <h1 className="dark:text-white text-gray-900 text-center text-2xl md:text-3xl font-semibold">
+            Registro para la Participación en el Protocolo de Chispeo y Voladura
+          </h1>
+          {/* <div className="dark:text-white text-gray-900 text-center text-5xl font-bold"> */}
+          <Reloj />
+          {/* </div> */}
+          {/* <img
             src="./images/logo_white.png"
             className="m-auto w-[13rem] md:w-72"
             alt=""
-          />
-          <h1 className="text-white text-center text-2xl md:text-4xl font-bold">
-            Registro para la Participación en el Protocolo de Chispeo y Voladura
-          </h1>
+          /> */}
         </div>
 
-        <div className="md:py-12 py-8 m-auto w-[80%] flex items-center justify-center flex-col ">
+        <div className="md:py-12 py-6 m-auto w-[80%] flex items-center justify-center flex-col ">
           <div className="relative w-full">
             <SearchBar handleChange={handleChange} />
             {results && results.length > 0 && (
@@ -107,7 +127,7 @@ const MainPage = () => {
         </div>
         <form
           onSubmit={onSubmit}
-          className="flex flex-col space-y-5 md:space-y-7 w-[80%] m-auto"
+          className="flex flex-col space-y-4 md:space-y-7 w-[80%] m-auto"
         >
           <div className="">
             <TextInput

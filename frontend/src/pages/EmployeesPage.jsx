@@ -1,5 +1,10 @@
 import { useEffect, useRef, useState } from "react";
-import { createEmployeeRequest, getEmployeesRequest } from "../api/employee";
+import {
+  createEmployeeRequest,
+  deleteEmployeeRequest,
+  getEmployeesRequest,
+  updateEmployeeRequest,
+} from "../api/employee";
 import { HeaderPageTable } from "../components/HeaderPageTable";
 import { Modal } from "../components/utils/Modal";
 import { toast } from "sonner";
@@ -13,11 +18,16 @@ import { AiFillSave } from "react-icons/ai";
 import { SearchResultsList } from "../components/SearchResultsList";
 import { SearchResultSimp } from "../components/SearchResult";
 import EmployeesTable from "../components/EmployeesTable";
+import { searchFunction } from "../helpers/search";
 
 const EmployeesPage = () => {
-  const [employees, setEmployees] = useState([]);
+  const [results, setResults] = useState([]);
   const [statePositions, setStatePositions] = useState([]);
   const [showFormEmploye, setShowFormEmploye] = useState(false);
+  const search = useRef(null);
+  const employees = useRef([]);
+  const employee = useRef(null);
+  const [itemsToShow, setItemsToShow] = useState(35);
 
   const getEmployees = async () => {
     try {
@@ -26,7 +36,16 @@ const EmployeesPage = () => {
         ...emp,
         full_name: `${emp.surname} ${emp.second_surname}, ${emp.names}`,
       }));
-      setEmployees(full_employee);
+      employees.current = full_employee;
+      if (search.current) {
+        const filteredResults = searchFunction(
+          employees.current,
+          search.current
+        );
+        setResults(filteredResults);
+      } else {
+        setResults(full_employee);
+      }
     } catch (error) {
       console.log(error);
     }
@@ -35,12 +54,23 @@ const EmployeesPage = () => {
   useEffect(() => {
     getEmployees();
   }, []);
-  console.log(employees);
 
-  function handleChangue(e) {}
+  function handleChangue(e) {
+    search.current = e.target.value;
+    const filteredResults = searchFunction(employees.current, search.current);
+    setResults(filteredResults);
+  }
 
-  const onShowEmployeeForm = (value, data, id) => {
+  const onShowEmployeeForm = (value, data) => {
     setShowFormEmploye(value);
+    if (data) {
+      setValue("dni", data.dni);
+      setValue("surname", data.surname);
+      setValue("second_surname", data.second_surname);
+      setValue("names", data.names);
+      setValue("position", data.position);
+    }
+    employee.current = data;
   };
   const {
     register,
@@ -51,19 +81,65 @@ const EmployeesPage = () => {
   } = useForm();
 
   const onSubmit = handleSubmit((values) => {
-    toast.promise(createEmployeeRequest(values), {
-      className: "dark:bg-gray-700 dark:text-white",
-      loading: "Cargando...",
-      success: () => {
-        getEmployees();
-        reset();
-        return <div>Creado Correctamente</div>;
-      },
-      error: (error) => {
-        console.log(error);
-      },
-    });
+    if (employee.current) {
+      toast.promise(updateEmployeeRequest(employee.current.dni, values), {
+        className: "dark:bg-gray-700 dark:text-white",
+        loading: "Cargando...",
+        success: () => {
+          getEmployees();
+          reset();
+          return <div>Actualizado Correctamente</div>;
+        },
+        error: (error) => {
+          return <div>{error.response.data}</div>;
+        },
+      });
+    } else {
+      toast.promise(createEmployeeRequest(values), {
+        className: "dark:bg-gray-700 dark:text-white",
+        loading: "Cargando...",
+        success: () => {
+          getEmployees();
+          reset();
+          return <div>Creado Correctamente</div>;
+        },
+        error: (error) => {
+          return <div>{error.response.data}</div>;
+        },
+      });
+    }
   });
+
+  const handleShowMore = () => {
+    setItemsToShow(itemsToShow + 35);
+  };
+
+  const handleShowMoreInit = () => {
+    setItemsToShow(35);
+  };
+
+  const handleDeleteEmployee = (dni) => {
+    toast(`¿Está seguro que deseas eliminar el registro?`, {
+      className: "dark:bg-gray-700 dark:text-white",
+      action: {
+        label: "Sí",
+        onClick: () => {
+          toast.promise(deleteEmployeeRequest(dni), {
+            className: "dark:bg-gray-700 dark:text-white",
+            loading: "Cargando...",
+            success: () => {
+              getEmployees();
+              return <div>Eliminado Correctamente</div>;
+            },
+            error: (error) => {
+              return <div>{error.response.data}</div>;
+            },
+          });
+        },
+      },
+      duration: Infinity,
+    });
+  };
 
   return (
     <>
@@ -72,7 +148,14 @@ const EmployeesPage = () => {
           onShowForm={onShowEmployeeForm}
           handleChangue={handleChangue}
         />
-        <EmployeesTable data={employees} />
+        <EmployeesTable
+          data={results}
+          itemsToShow={itemsToShow}
+          handleShowMore={handleShowMore}
+          handleShowMoreInit={handleShowMoreInit}
+          handleDelete={handleDeleteEmployee}
+          onShowForm={onShowEmployeeForm}
+        />
       </div>
       <div
         className={`h-full w-full top-0 left-0 bg-[rgba(0,0,0,0.5)] z-10 fixed ${

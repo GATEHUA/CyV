@@ -1,8 +1,9 @@
 export const headTableEmployees = [
-  "Acciones",
+  "N°",
   "DNI",
   "Apellidos y Nombres",
   "Puesto",
+  "Acciones",
 ];
 
 export const positions = [

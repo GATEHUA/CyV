@@ -21,10 +21,10 @@ func (s *Serv) AddEmployee(ctx context.Context, employee *models.Employee) error
 }
 
 func (s *Serv) EditEmployee(ctx context.Context, employee *models.Employee, whereDni string) error {
-	e, _ := s.repo.SelectEmployeeByDni(ctx, employee.Dni)
-	if e != nil {
-		return ErrEmployeeAlreadyExists
-	}
+	// e, _ := s.repo.SelectEmployeeByDni(ctx, employee.Dni)
+	// if e != nil {
+	// 	return ErrEmployeeAlreadyExists
+	// }
 	return s.repo.UpdateEmployee(ctx, employee, whereDni)
 }
 

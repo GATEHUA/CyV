@@ -25,3 +25,51 @@
 ::-webkit-scrollbar-thumb:active {
   background: rgb(156, 163, 175);
 }
+
+.sidebar-open {
+  width: 16rem;
+  transition: width 0.3s ease-in-out;
+}
+
+.sidebar-closed {
+  width: 4rem;
+  transition: width 0.3s ease-in-out;
+}
+
+@media screen and (max-width: 640px) {
+  .sidebar-open {
+    width: 0; /* Mueve el sidebar fuera de la vista a la izquierda */
+    transition: 0.1s ease-in-out;
+  }
+  .sidebar-closed {
+    width: 16rem;
+    transition: 0s ease-in-out;
+  }
+}
+
+@media screen and (max-width: 640px) {
+  .sidebar-openLect {
+    display: none; /* Mueve el sidebar fuera de la vista a la izquierda */
+    transition: 0.1s ease-in-out;
+  }
+  .sidebar-closedLect {
+    display: block; /* Mueve el sidebar fuera de la vista a la izquierda */
+    width: 16rem;
+    transition: 0s ease-in-out;
+  }
+}
+
+.rotate-180 {
+  transform: rotate(180deg);
+}
+
+.selectcont {
+  background-position-x: calc(100% - 15px);
+}
+.link {
+  @apply p-2.5 flex rounded-md gap-6 items-center md:cursor-pointer cursor-default duration-300 font-medium hover:bg-slate-100 dark:hover:bg-slate-700 uppercase;
+}
+
+.active {
+  @apply bg-blue-100 dark:bg-slate-600 dark:text-blue-400 text-blue-600;
+}
